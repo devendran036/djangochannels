@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static%}
+   
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <title>Document</title>
+    
+    <script>if(sessionStorage.getItem('online_status')==null){
+         sessionStorage.setItem('online_status',true)
+ 
+    }
+   </script>
+     <style>
+       html,body{
+           margin: 0;
+           height: 100%;
+           width: 100%;
+       }
+        .pack{
+            height: 93%;
+            width: 95%;
+            
+            display: flex;
+            flex-grow: 1;
+            flex-direction: row;
+            justify-content: center;
+            align-items: stretch;
+           
+        }
+        .newspack{
+            width: 97%;
+    height: fit-content;
+    cursor: pointer;
+    padding-top: 28px;
+           
+           
+        }
+        .news{
+            overflow-y: scroll;
+            min-height: fit-content;
+            width: 34%;
+            
+        }
+
+        .container{
+            position: relative;
+            width: 20%;
+            height: 90%;
+            background-color:orange;
+            overflow-y: auto;
+            transform: translate(-51px, 79px);
+            display: none;
+            
+        }
+        .userbox{
+            text-align: end;
+            position: relative;
+    width: 100%;
+    height: 9%;
+    background-color: seashell;
+    
+    overflow-wrap: break-word;
+    overflow-y: hidden;
+        }
+        .message{
+            height: 50%;
+            width: auto;
+            background-color: pink;
+            display: none;
+        }
+        .newsimg{
+            object-fit: cover;
+            width: 100%;
+            height: auto;
+
+        }
+        
+    .main_menu{
+        display: none;
+        position: absolute;
+        width:20%;
+        height: 90%;
+        background-color: yellow;
+        float:left;
+        
+    }
+    .main_menu img{
+        position: relative;
+    height: 79px;
+    border-radius: 20px;
+    width: 97px;
+    
+    }
+    .show{
+    display: inline-block;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 15px;
+    background-color: aqua;
+    max-width: 30rem;
+    word-break: break-all;
+    max-height: fit-content;
+    
+   
+}
+        
+        .profile_menu
+        {
+           
+            display: inline-flex;
+            width: -webkit-fill-available;
+        }
+        .menuicon{
+            position: -webkit-sticky;
+            
+            display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    top: 0;
+    background-color: red;
+    padding: 20px;
+    font-size: 20px;
+    width: auto;
+        }
+        
+        
+        
+        .proimg{
+    position: absolute;
+    height: 79px;
+    border-radius: 20%;
+    width: 97px;
+    display: block;
+    
+
+}
+
+
+.show img{
+        width: 170px;
+        height: 170px;
+    }
+.msgview{
+    
+    height: 90%;
+    background-color: red;
+    overflow-y: auto;
+
+}
+.msgbut{
+    width:85%;
+    height: 8%;
+}
+.sendbt{
+    right: 0;
+    width: 12.8%;
+    height: 10%;
+
+}
+
+.receiver{
+    text-align: left;
+    
+   
+    
+}
+
+
+
+.sender{
+    text-align: right;
+    line-height: 1.4;
+    
+}
+#video-call-div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+#local_video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 16px;
+    border-radius: 16px;
+    max-width: 20%;
+    max-height: 20%;
+    background: #ffffff;
+}
+
+#received_video {
+    background: #000000;
+    width: 100%;
+    height: 100%;
+}
+
+.call-action-div {
+    position: absolute;
+    left: 45%;
+    bottom: 32px;
+}
+
+button {
+    cursor: pointer;
+}
+.postcontainer{
+      position: absolute;
+      width: 30%;
+      height: 60%;
+      background-color: whitesmoke;
+      border-radius: 50px;
+    
+      padding:10px;
+      border:3px solid green;
+      margin: auto;
+      transform: translate(120%,10%);
+      justify-content: stretch;
+      display: none;
+      
+
+      
+
+  }
+  .postcontainer img{
+    border-radius: 50px;
+    width: 100%;
+   height: 80%;
+   background-size: cover;
+   background-repeat: no-repeat;
+   background-position: center;
+  }
+  .postbtn{
+    
+    background-color:snow;
+    border-radius: 50px;
+    
+    width: 50%;
+    height: 50px;
+    transform: translate(50%);
+   
+    
+  }
+  .cancelbtn{
+    
+    background-color:red;
+    border-radius: 50px;
+    
+    width: 50%;
+    height: 50px;
+    transform: translate(-50%,60px);
+   
+    
+    
+  }
+  
+  .userreq{
+   
+    border-radius: 30px;
+    background-color: cyan;
+    width: 24%;
+    height: 6%;
+    text-align: center;
+    font-size: 2.4rem;
+    margin-left: -34px;
+    margin-top: 11px;
+    
+  }
+  .getpost :hover {
+    background-color: green;
+    
+  }
+  input[type='file'] {
+  opacity:0    
+}
+.popback{
+    width: 100%;
+    height: 100%;
+    background-color: gainsboro;
+    position: absolute;
+    z-index: 999;
+    display: none;
+}
+.pimg{
+    width: 62px;
+    border-radius: 20%;
+}
+.cmbtn{
+    height:4%;
+
+}
+.cmbox{
+    width: 62%;
+    height: 3%;
+}
+#menu{
+    width: 50px;
+    float: left;
+}
+@media screen and (max-width:768px){
+    .container{
+        display: none;
+    }
+    .news{
+        width: 100%;
+    }
+   
+    .pack{
+        width: 100%;
+    }
+    
+    
+    
+}
+
+
+
+</style>
+<body>
+    
+   
+    <div class="menuicon"><button id="menu">menu</button></div>
+
+    
+        
+        <div class="main_menu" id="menu_bar" >
+        <li><div class="profile_menu"><img src={{request.user.profiledata.profile_pic.url}}><h3>{{request.user}}</h3></div></li>
+        <li> setting</li>
+        <li>message</li>
+        <li>notifi</li>
+        <li>logout</li></div>
+       
+        <div class="pack" id='wrapper'>
+            
+                   <div class="popback"><div class="postcontainer" id='pcter'><img id="blah" src="#"><button onclick='postit()' class='postbtn'>Post it</button><button id='cancel' class='cancelbtn'>cancel it</button></div>
+                </div>
+            <div class="container">
+               
+            </div>
+            <div class="news">
+                <div class="getpost"><input  class="userreq" id='file' onchange="readURL(this);" type='file'   accept="image/x-png,image/gif,image/jpeg">
+                    <label class="userreq" for="file">Upload a Image/Video/Text</label>
+                     </div>
+            </div></div>
+            <div id="video-call-div">
+                <video muted id="local_video" autoplay></video>
+                <video id="received_video" autoplay></video>
+                <div class="call-action-div">
+                    <button onclick="muteVideo()">Mute Video</button>
+                    <button onclick="muteAudio()">Mute Audio</button>
+                    <button onclick="hangUpCall()">hangup</button>
+                </div>
+            </div>
+            
+        
+
+</body>        
+    
+
+
+
+
+<script>
+    let fromData;
+    function readURL(input) {
+  $('div.postcontainer').show()
+  $('div.popback').show()
+    if (input.files && input.files[0]) {
+        fromData = new FormData();
+        fromData.append('post', input.files[0]);
+        fromData.append('post_type',0);
+    
+       
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#blah')
+                .attr('src', e.target.result)
+                
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+function postit(){
+    fetch('api/uploadpost/',{
+            method:'POST',
+            
+            body:fromData,
+            headers:{
+                "X-CSRFToken":'{{csrf_token}}',
+                
+            }
+        })
+        .then(response=>response.json())
+        .then(data=>{sendmessage('img',data.image_upload)})
+        .catch(error=>{
+            console.error(error)
+        })
+        alert('Sucess!')
+        $('div.popback').hide()
+
+}
+document.getElementById("cancel").addEventListener("click",cancel);
+  
+function cancel(){
+  document.getElementById("pcter").style.display='none'
+  $('div.popback').hide()
+
+
+}
+    $('#menu').click(function(){
+        if(document.getElementById("menu_bar").style.display=='block'){
+            $("#menu_bar").hide()
+
+        }
+        else{
+            $("#menu_bar").show()
+            
+        }
+    })
+    
+    $('form').submit(function(event){
+        alert('dome')
+        event.preventDefault()
+        var data=new FormData(this.event);
+        $.ajax({
+            url:'api/uploadpost/',
+            data:data,
+            type:"POST",
+            contentType:false,
+            sucess:'action',
+            error:'Failed'
+
+        })
+    })
+    
+    friendlist=[]
+    likedpost=[]
+  
+    var user_messages={}
+    var hashtag_info={}
+    friendlist=[]
+
+    var order=[]
+    const userid=Number('{{request.user.id}}')
+    const username='{{request.user}}'
+    var user_messages={}  /* storing messages fetch from api  */
+    var hashtag_info={}   /* storing last message,seen,message count,last sender*/
+    var order=[]      /* storing to show the user order*/
+    var user=''   /* user clicked */
+    var preuser='' /* user before*/
+    var localselected=[]
+    var mul=false
+    var globalselected=[]
+    /*var socket =new WebSocket*/
+    var caller_name;
+    var profile_data={}
+   /* socket.on('connect',function(){})
+    socket.on('disconnect',function(){alert("something Went Wrong Please try again!")})
+    socket.on('datarec',function(data){handledata(data)})*/
+    function handledata(data){
+        
+        if(data.type=='ms'){
+          
+            if(user==data.username || user==data.user_send){
+                if(data.username==userid){
+                    if(data.mty=='text'){
+                        $('div.msgview').append(`<div class='receiver'><div class='show'><div class='show'><p>${data.msg}</p></div></div></div>`)
+                    }
+                    else{
+                        $('div.msgview').append(`<div class='receiver'><div class='show'><div class='show'><img class='msgimg'src='${data.msg}'></div></div></div>`)
+
+                    }
+                    
+                }
+                else{
+                    if(data.mty=='text'){
+                    $('div.msgview').append(`<div class='sender'><div class='show'><div class='show'><p>${data.msg}</p></div></div></div>`)
+                    }
+                    else{
+                        $('div.msgview').append(`<div class='sender'><div class='show'><div class='show'><img class='msgimg' src='${data.msg}'></div></div></div>`)
+                    }
+}
+               
+            }
+            if(data.seen){
+                if(data.username==userid){
+                    hashtag_info[data.hashtag][1]=false
+                hashtag_info[data.hashtag][0]+=1
+                
+                a=document.getElementById(data.hashtag+'count')
+                if (a.style.display=='none'){a.style.display='block'}
+                a.innerHTML=hashtag_info[data.hashtag][0]
+
+                }
+            }
+            else{
+                $('div.msgview').append('<div class="sender"><h3>seen</h3></div>')
+                hashtag_info[data.hashtag][1]=true
+
+            }
+            hashtag_info[data.hashtag][3]=data.username
+            user_messages[data.hashtag].push([data.id,data.msg,data.username,data.mty])
+            document.getElementById(data.hashtag+'lmg').innerHTML=data.msg
+        }
+        else if (data.type=='sel'){
+            globalselected.push(data.user_send)
+            console.log('selected by global user')
+            if(data.seen){
+                hashtag_info[data.hashtag][1]=true
+                if(user+userid==data.hashtag){
+                    $('div.msgview').append('<div class="sender"><h3>seen</h3></div>')
+                    
+                }
+               
+            }
+           
+           
+        }
+        else if(data.type=='unsel'){
+         
+            
+            try{
+                rr=globalselected.indexOf(data.user_send)
+            globalselected.splice(rr,1)
+
+            }
+            catch{
+                alert('error')
+            }
+        }
+        else if(data.type=='on'){
+           
+            $("#"+data.user+'oe').css("background-color", "green");
+            hashtag_info[data.user+userid][6]=true 
+        }
+        else if(data.type=='of'){
+           
+           $("#"+data.user+'oe').css("background-color", "red");
+           try{
+            hashtag_info[data.user+userid][6]=false
+           }
+           catch{}
+           
+           
+       }
+       else if(data.type=='mul'){
+           mul=true
+           alert('true')
+       }
+       else if (data.type=='re'){
+      
+                r=document.getElementById(`${data.user+userid}count`)
+       
+       if (r.style.display=='block'){
+           r.style.display='none'
+           
+           
+       }
+          hashtag_info[data.user+userid][0]=0
+          hashtag_info[data.user+userid][1]=true
+                
+            }
+       
+
+
+    }
+function display(){
+    online=[]
+        pos=72
+        zindex=1
+        
+        for(d in order){
+            $('div.container').append(`<div class='userbox' style="z-index:${zindex};transition:transform 0.2s ease 0.1s; height: 72px;" id=${order[d]} onclick='show(${order[d]})'><img class='proimg'src='${hashtag_info[order[d]][5]}'>${hashtag_info[order[d]][4]}<p id=${order[d]}lmg >${hashtag_info[order[d]][2]}</p></div>`)
+            if(hashtag_info[order[d]][6]){
+                online.push(order[d]-userid)
+                
+                $(`#${order[d]}`).append(`<div id=${order[d]-userid}oe class="status-circle" style="background-color:green;"></div>`)
+            }
+            else{
+                $(`#${order[d]}`).append(`<div id=${order[d]-userid}oe class="status-circle" style="background-color:red;"></div>`)
+            }
+            if(hashtag_info[order[d]][0]>0 && hashtag_info[order[d]][3]==userid){
+                $(`#${order[d]}`).append(`<span id="${order[d]}count" class="dot">${hashtag_info[order[d]][0]}</span>`)
+               
+            }
+            else{
+                $(`#${order[d]}`).append(`<span id="${order[d]}count" style='display:none;' class="dot">${hashtag_info[order[d]][0]}</span>`)
+            }
+            $('div.container').append(`<div class='message' id='${order[d]}p'></div>`)
+     
+            pos+=72
+            zindex+=1
+        }
+        data={'user':userid}
+        console.log(online)
+        if(online.length>0){
+            
+            data.may=true
+            data.username=online
+
+
+        }
+        else{
+            may=false
+        }
+        emitdata('save',data)
+       
+        
+
+}
+let e=''
+    function show1(a){
+        if (e!='' && e!=a){
+            
+
+        }
+        if(e!=a){
+            
+           document.getElementById(a+'p').innerHTML='<div class="msgview"></div><input  id="inputmsg" class="msgbut" type="text"><button onclick="sendmessage()" class="sendbt">se</button>'
+            e=a
+        }
+      
+        
+        
+    }
+function makerequest(request){
+       return new Promise((resolve,reject)=>{
+           fetch(request)
+           .then((response)=>response.json())
+           .then(data=>{resolve (data)})
+           .catch(error=>{
+              console.error(error)
+            reject("Some Thing Went Wrong!")})
+           })
+    }
+    function emitdata(datatype,socketdata){}
+async function getorder(){
+    const get_api=await getpost('api/chat/')
+    
+    for(x in get_api.order){
+        hashtag_info[get_api.order[x].hashtag]=[get_api.order[x].msgcount,get_api.order[x].status,'You have connected sucessfully']
+        user_messages[get_api.order[x].hashtag]=[]
+        order.push(get_api.order[x].hashtag)
+        friendlist.push(get_api.order[x].hashtag-userid)
+        profile_data[get_api.profile[x].name]=get_api.profile[x].profile_pic
+
+    }
+    for(x in get_api.message){
+            hashtag_info[get_api.message[x].hashtag][3]=get_api.message[x].receiver
+            hashtag_info[get_api.message[x].hashtag][2]=get_api.message[x].messagd
+        }
+        for(d in get_api.profile){
+            hash=get_api.profile[d].user+userid
+            hashtag_info[hash][4]=get_api.profile[d].name
+            hashtag_info[hash][5]=get_api.profile[d].profile_pic
+            hashtag_info[hash][6]=get_api.profile[d].online_status
+        }
+  
+    
+    
+   }
+   getorder()
+    
+    
+    
+    async function getpost(url){
+        return new Promise((resolve,reject)=>{
+            fetch(url)
+            .then((response)=>response.json())
+           .then(data=>{resolve (data)})
+           .catch(error=>{
+            reject("Some Thing Went Wrong!")})
+           
+        })
+    }
+    
+    async function makepost(url,data=null){
+        return new Promise((resolve,reject)=>{
+            fetch(url,{
+            method:"POST",
+            body:JSON.stringify(data),
+            headers:{
+                "X-CSRFToken":'{{csrf_token}}',
+                'Content-type':'application/json;charset=UTF-8'}
+        })
+        .then((response)=>response.json())
+        .then((data)=>{resolve(data)})
+        .catch(error=>{
+            reject("Some Thing Went Wrong!")})
+    
+
+        })
+    
+        
+    
+    
+    }
+    async function comment(postid){
+        data=document.getElementById(postid+'c').value
+        a=await makepost(`http://127.0.0.1:8000/api/comment/${postid}/`,data)
+        if(a['ok']){
+            if(document.getElementById(postid+'no')!=null){
+                $('#'+postid+'no').remove()
+            }
+            $('#'+postid+'co').append(`<br><span><strong>${username}</strong>  ${data} </span>`)
+         
+        }
+        else{
+            alert('UnSucess!')
+        }
+        
+    }
+    async function like(postid){
+        countt=document.getElementById(postid+"count").innerHTML
+        
+        if(likedpost.includes(postid)){
+           a =await makepost(`http://127.0.0.1:8000/api/likepost/${postid}/1/`)
+           
+        
+    
+        if(a=='ok'){
+          
+             document.getElementById(postid+"count").innerHTML=Number(countt)-1
+            document.getElementById(postid+'b').innerHTML='Like'
+           t=likedpost.indexOf(postid)
+           likedpost.splice(t, 1);
+
+        }
+           
+        }
+        else{
+            a=await makepost(`http://127.0.0.1:8000/api/likepost/${postid}/0/`)
+           
+           
+    
+        if(a=='ok'){
+            document.getElementById(postid+"count").innerHTML=Number(countt)+1
+            likedpost.splice(0,0,postid)
+            document.getElementById(postid+'b').innerHTML='DisLike'
+            
+
+        }
+
+        }
+        
+
+    }
+    function share(name,id){
+        location.href=`/${id}/post/${name}/`
+    }
+    
+    
+    
+       
+    
+    async function make(){
+       
+            
+        
+
+      
+            a=await getpost(`http://127.0.0.1:8000/api/getpost/0/5`)
+            console.log(a)
+            
+            for(c in a.data){
+                
+                $('div.news').append(`<div class="newspack" id='${a.data[c].id}'><img class='pimg' src=${profile_data[a.data[c].user]} alt='pr'><strong>${a.data[c].user}</strong><img class='newsimg' src=${a.data[c].post}><span id=${a.data[c].id}count >${a.data[c].likecount}</span><span id=${a.data[c].id}lc></span><br><button id=${a.data[c].id}b type='button' onclick="like(${a.data[c].id})">Like</button><button onclick="comment(${a.data[c].id})">Comment</button><button onclick='share(${a.data[c].id},"${a.data[c].user}")'>Share</button><span id=${a.data[c].id}no></span></div><div id=${a.data[c].id}co></div><br><input class='cmbox' id=${a.data[c].id}c placeholder='Type a comment.....' id=><button class='cmbtn' onclick='comment(${a.data[c].id})'>Comment it</button>`)
+    
+
+            }
+            
+            postid=0
+            cid=0
+            for(c in a.LCM){
+                postid=a.LCM[c][0]
+                
+                if( a.LCM[c][1]==username){
+                    likedpost.splice(0,0,a.LCM[c][0])
+                    document.getElementById(a.LCM[c][0]+'b').innerHTML='Dislike'
+                    
+                }
+             
+                
+                
+                if(a.LCM[c][0]==postid && postid==cid){
+                    $(`#${a.LCM[c][0]}lc`).append(`  ${a.LCM[c][1]  }  Like This`)
+                    
+                }
+                else{
+                    $(`#${a.LCM[c][0]}lc`).append(`  ${a.LCM[c][1]  }  and`)
+                  
+
+                    
+                }
+                
+                
+                
+               
+                
+        
+            
+              
+            
+            
+            
+            
+        }
+        for(c in a.Comments){
+           $('#'+a.Comments[c].post+'no').remove()
+
+            $('#'+a.Comments[c].post+'co').append('<br><span><strong>'+a.Comments[c].user+'</strong>'+a.Comments[c].comment+'</span>')
+
+        }
+        
+      
+      
+    
+        
+    
+
+
+    
+}
+make()
+async function show(hashid){
+    $('div.sender').remove()
+            $('div.receiver').remove()
+        show1(hashid)
+       console.log('Selected--',hashid)
+        
+
+        $('#'+hashid+'p').show()
+        
+        
+        if(user!=''){
+            
+        
+            preuser=user
+            console.log('Unselected--',preuser)
+            t=localselected.indexOf(user)
+            $(`#${preuser+userid}p`).hide()
+            
+            
+            
+            localselected.splice(t,1)
+            /*document.getElementById(user+userid).style.pointerEvents = 'auto'*/
+            
+            if(hashtag_info[user+userid][6]){
+                emitdata('unselected',{type:'unsel',username:user,user_send:userid})
+            }
+            else{
+                console.log('no-need')
+            }
+        }
+
+
+        user=hashid-userid
+        data={type:'sel',username:user,user_send:userid,hashtag:hashid}
+        r=document.getElementById(hashid+'count')
+       
+        if (r.style.display=='block'){
+            r.style.display='none'
+            data.re=true
+            
+            
+        }
+        
+        if(hashtag_info[hashid][1]==false && hashtag_info[hashid][3]==userid){
+          
+            data.seen=true
+            
+            
+        }
+        
+        if(hashtag_info[hashid][6]){
+            
+                emitdata('selected',data)
+        }
+        
+       /* document.getElementById(hashid).style.pointerEvents = 'none' */
+        localselected.push(user)
+       
+
+        if(user_messages[hashid].length==0 || user_messages[hashid].length==1){
+            messages=await makerequest(`/api/getmessages/${hashid-userid}/${hashid}/`)
+            lm=messages.length
+            for(y=lm;y--;){
+                user_messages[hashid].push([messages[y].id,messages[y].messagd,messages[y].receiver,messages[y].messagetype])
+            }
+        }
+        c=user_messages[hashid].length
+       
+        for(i=0;i<c;i++){
+            
+            if(user_messages[hashid][i][2]!=userid){
+                if (user_messages[hashid][i][3]=='text'){
+                    $('div.msgview').append(`<div class='sender'><div class='show'><p>${user_messages[hashid][i][1]}</p></div></div>`)
+
+                }
+                else{
+                    $('div.msgview').append(`<div class='sender'><div class='show'><img class='msgimg' src='${user_messages[hashid][i][1]}'></div></div>`)
+                }
+            }
+        else{
+            if (user_messages[hashid][i][3]=='text'){
+            $('div.msgview').append(`<div class='receiver'><div class='show' ><p>${user_messages[hashid][i][1]}</p></div></div>`)
+            }else{
+                $('div.msgview').append(`<div class='receiver'><div class='show' ><img class='msgimg' src='${user_messages[hashid][i][1]}'></div></div>`)
+            }
+        }
+        
+    }
+    if(hashtag_info[hashid][1] && hashtag_info[hashid][3]!=userid){
+           
+        $('div.msgview').append('<div class="sender"><h3>seen</h3></div>')
+           
+       }
+            
+
+        
+        
+ 
+    }
+    function sendmessage(img=null){
+        
+        hashtag=user+userid
+        if(img==null){
+            message=$('#inputmsg').val()
+            data={'type':'ms','mty':'text','msg':message,username:user,user_send:userid,hashtag:hashtag,seen:true}
+        }
+        else{
+            data={'type':'ms','mty':'img','msg':img,username:user,user_send:userid,hashtag:hashtag,seen:true}
+
+        }
+        
+        
+        if(hashtag_info[hashtag][6]){
+            data.online=true
+           
+        }
+        if(globalselected.includes(user)){
+            data.seen=false
+        }
+       
+        if(preuser!=user){
+            pos=-72
+        t=order.indexOf(hashtag)
+        order.splice(t, 1);
+        order.splice(0,0, hashtag)
+        for(x in order){
+            console.log(order[x])
+        document.getElementById(order[x]).style.transform=`translateY(${pos}px)`;
+        pos-=72
+      }
+      
+}
+   emitdata('message',data)
+    }
+
+
+    
+ 
+    
+
+    
+        
+
+    
+    
+</script>
+
+</html>

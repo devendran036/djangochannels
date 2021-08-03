@@ -1,0 +1,48 @@
+{%if req%}
+<form id='acc' method="Post">
+{% csrf_token %}
+{%for names in req%}
+<h1>{{names.sender}}</h1>
+<button id="{{names.sender_id}}"  type='button' onclick="accept('{{names.sender_id}}')" value="{{names}}">Add as Friend</button>
+
+{% endfor %}
+</form>
+
+{%else%}
+
+<h1>You dont have any friend request right now</h1>
+{% endif %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+
+function accept(a){
+  
+    
+        
+        $.ajax({
+            type:"POST",
+            url:"/showrequest",
+
+            data:{'username':Number(a),'csrfmiddlewaretoken':'{{csrf_token}}'},
+            dataType:'json',
+            sucess:function(event){
+                event.preventDefault()
+
+                alert('sucess!');
+
+            }
+        })
+       
+    
+   
+ 
+    document.getElementById(a).style.display='none'
+    
+    
+    
+
+
+
+}
+</script>
+

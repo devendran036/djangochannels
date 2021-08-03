@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body,html{
+            margin: 0;
+            height: 100%;
+            width:100% ;
+            background-color: cornsilk;
+        }
+        .loginbox{
+           
+            width: 20%;
+    height: 20%;
+    margin: auto;
+    background-color: red;
+    padding-top: 10px;
+ 
+    animation: roll 2s linear ;
+    transform: translate(40px, 300px);
+        }
+        .loginbox input{
+            display: block;
+    margin: 10px 46px;
+    padding: 10px 23px;
+    border-radius: 50px;
+    width: 59%;
+    padding-top: 20px;
+    animation: rolle 4s linear ;
+           
+        }
+        .loginbox button{
+            display: block;
+    margin: 10px 46px;
+    padding: 10px 23px;
+    border-radius: 50px;
+   
+    padding-top: 20px;
+    animation: rolle 4s linear ;
+    width: 59%;
+           
+        }
+        @keyframes roll {
+            0%{transform: translate(0px, 0px);}
+            50%{transform: translate(40px, 195px);}
+            100%{transform: translate(40px, 300px);}
+            
+        }
+        @keyframes rolle {
+            0%{opacity: 0;}
+            50%{opacity: 1;}
+            100%{width:59%;}
+            
+        }
+    </style>
+</head>
+<body>
+    <div id='lbox' class="loginbox">
+            <form method='Post'>
+        {% csrf_token %} 
+        
+        <input  type='text' name='name'>
+        <input type='text' name='pass'>
+        <button  type='Submit'>Submit</button>
+        </form>
+    </div>
+</body>
+<script>
+  
+   
+    
+</script>
+</html>
+
+ 

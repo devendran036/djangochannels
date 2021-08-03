@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static%}
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        html, body {
+           height: 96%;
+           width: 99%;
+       }
+       
+       .pack{
+           height: 100%;
+           width: 100%;
+           position: relative;
+           overflow-y: scroll;
+           display: flex;
+           flex-grow: 1;
+           flex-direction: row;
+           justify-content: center;
+           align-items: stretch;
+          
+       }
+       .news{
+           
+          
+           min-height: fit-content;
+           width: 30%;
+       }
+
+
+       
+       .newspack{
+           width: 100%;
+           height: fit-content;
+           cursor: pointer;
+       }
+       .newspack img{
+           object-fit: cover;
+           width: 100%;
+           height: auto;
+
+       }
+       
+   .main_menu{
+       display: none;
+       position: absolute;
+       width:20%;
+       height: 90%;
+       background-color: yellow;
+       float:left;
+   }
+   .main_menu img{
+       position: relative;
+   height: 79px;
+   border-radius: 20px;
+   width: 97px;
+   
+   }
+       
+       .profile_menu
+       {
+          
+           display: inline-flex;
+           width: -webkit-fill-available;
+       }
+       .menuicon{
+           position: -webkit-sticky;
+           
+           display: flex;
+           flex-grow: 1;
+           flex-direction: column;
+           top: 0;
+           background-color: red;
+           padding: 20px;
+           font-size: 20px;
+       }
+       .friendscontainer {
+        position: relative;
+    width: auto;
+    height: 40%;
+    
+    background-color: green;
+    text-align: center;
+}
+.friendscontainer img{
+    width: 179px;
+    border-radius: 50%;
+}
+.cancel{
+    background-color: red;
+}
+.add{
+    background-color: green;
+}
+.confirm{
+    background-color: snow;
+    border-radius: 50px;
+    width: 20%;
+    height: 20%;
+    font-size: 2rem;
+    cursor: pointer;
+
+}
+
+</style>
+<body>
+   
+  <!-- <form action='' method='post' enctype="multipart/form-data">
+       {% csrf_token %}
+       <input type="file" id='image'>
+   <button type="submit" onclick='upload()' id='btnupload'>Upload a Post</button>
+   </form>-->
+   <div class="menuicon"><button id="menu">menu</button></div>
+   
+       
+       <div class="main_menu" id="menu_bar" ><li><div class="profile_menu"><img src={{request.user.profiledata.profile_pic.url}}><h3>{{request.user}}</h3></div></li>
+           
+           <li>
+               setting
+           </li>
+           <li>
+               message
+           </li>
+           <li>
+               notifi
+           </li>
+           <li>
+               logout
+           </li>
+       </div>
+       <div class="friendscontainer">
+           <h1>Total Friends {{profile.totatfriends}}</h1>
+           <h1>Post {{profile.totalpost}}</h1>
+           <img src="{{profile.profile_pic.url}}">
+           <h1>{{profile.name}}</h1>
+          
+         
+           {% if c %}
+           <button class='confirm'>Confirm</button>
+           
+           {% elif r %}
+           <button class='cancel'>Cancel</button>
+           {% elif e %}
+           <button class='cancel'>Remove</button>
+           {% else %}
+           <button class='add'>Add</button>
+           {% endif %}
+        
+         
+    </div>
+       <div class="pack">
+          
+    
+   <div class="news">
+       {% if private %}
+       <h1>This is Private Post You cannot see it</h1>
+
+
+       {% else%}
+       {% for d in post %}
+       <div class="newspack" >{{d.0}}<img src=/images/{{d.3}}>
+        {% for y in likes%}
+        {%ifequal y.0 d.1 %}
+        <span>{{y.1}}</span>
+        {% endifequal %}
+        {% endfor %}
+
+        <span >{{d.2}}</span><br><button type='button'>Like</button><button>Comment</button><button>Share</button><span>No comments Yet</span></div><div></div><br><input  placeholder='Type a comment.....' ><button>Comment it</button>
+        {% endfor%}  
+        {% endif %}
+
+
+   </div>
+  
+</div>
+
+</body>
+     
+   
+</body>
+</html>
+<script>
+    
+</script>

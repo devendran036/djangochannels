@@ -1,0 +1,695 @@
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    {% load static%}
+    <link rel="stylesheet" type="text/css" href="/static/chat.css">
+    <style>.dot{
+    height: 25px;
+    width: 25px;
+    background-color: orange;
+    border-radius: 50%;
+    display: inline-block;
+    text-align: center;
+    font-size: 25px;
+    margin-top: -20px;
+    
+    }
+    .show img{
+        width: 170px;
+        height: 170px;
+    }
+    .status-circle {
+width: 15px;
+height: 15px;
+border-radius: 50%;
+
+border: 2px solid white;
+bottom: 0;
+right: 0;
+position: absolute;
+}
+#received_video {
+    background: #000000;
+    width: 100%;
+    height: 100%;
+}
+.spy{
+    height: 86.6%;
+    top: 60.8px;
+}
+.popup{
+    display: none;
+    position: absolute;
+    background-color: snow;
+    z-index:1;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    text-transform: capitalize;
+}
+.popup img{
+    
+    transform: translate(12px, 149px);
+    width: 30%;
+}
+.confirms{
+    border-radius: 50px;
+    border: 10px solid;
+    background-color: seagreen;
+    bottom: 0px;
+    position: absolute;
+    font-size: 2rem;
+    width: 250px;
+    left: 30%;
+
+}
+.cancel{
+    border-radius: 50px;
+    border: 10px solid;
+    background-color: red;
+    bottom: 0px;
+    position: absolute;
+    font-size: 2rem;
+    width: 250px;
+    left: 50%;
+}
+.inputbox{
+    resize: none;
+    min-width: 47%;
+}
+
+.ibn{
+    opacity: 0;
+}
+.msgfield{
+    width: 70%;
+    height: 6%;
+    background-color: skyblue;
+    position: absolute;
+    left: 15%;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+}.inputbox{
+    height: 51px;
+    width:  -webkit-fill-available;
+    
+}
+.sendbtn{
+    width: 144px;
+    float: right;
+    height: -webkit-fill-available;
+}
+.lockbtn{
+    width: 144px;
+    height: -webkit-fill-available;
+}
+.msgfield label{
+    transform: translate(-9px, 0px);
+    background: red;
+    height: -webkit-fill-available;
+    width: 131px;
+}
+
+</style>
+</head>
+<body>
+<div id="wrapper">
+    <div class="popup">
+        <h2 id='sio'>Send Image/Video To</h2>
+        <img   src="#" id='imgg'>
+        <button class='confirms' onclick='sendimage()' type="button">Send</button>
+        <button class='cancel' onclick='dontsend()' type="button">Cancel</button>
+      </div>
+    <div class='main'>
+       
+        
+  </div>
+  <div class="infobox" id="info"><button onclick='call()' >call</button></div>
+  <div id='spybox' class='spy'>
+     
+      
+      
+  </div>
+  <div class="msgfield">
+     
+    <textarea id='inputmsg' class='inputbox' type="text"></textarea>
+     <input  class='ibn' id='file' onchange="readURL(this);" type='file'   accept="image/*">
+     <label for='file'>Image</label>
+     <button  class='lockbtn' onclick='sendlocked()' type="button" >Lockit</button>
+     <button onclick='sendmessage("text")' type="button" class="sendbtn">Send</button>
+    
+     
+    </div>
+     
+     
+     
+  </div>
+  <div id="video-call-div">
+    <video muted id="local_video" autoplay></video>
+    <video id="received_video" autoplay></video>
+    <div class="call-action-div">
+        <button onclick="muteVideo()">Mute Video</button>
+        <button onclick="muteAudio()">Mute Audio</button>
+        <button onclick="hangUpCall()">hangup</button>
+    </div>
+</div>
+<div id="call">
+    <div class='box'>
+        <h2 class='name'>HIi</h2><button type="button" onclick="accepted()" class='acc'>accept</button><button onclick='rec()' class='rec' type="button">reject</button>
+    </div>
+    </div>
+</body>
+<script>
+   
+    
+    const userid=Number('{{request.user.id}}')
+    const username='{{request.user}}'
+    var user_messages={}  /* storing messages fetch from api  */
+    var hashtag_info={}   /* storing last message,seen,message count,last sender*/
+    var order=[]      /* storing to show the user order*/
+    var user=''   /* user clicked */
+    var preuser='' /* user before*/
+    var localselected=[]
+    var mul=false
+    var globalselected=[]
+    if(location.protocol=='https'){
+        w='wss://'
+
+    }
+    else{
+        w='ws://'
+    }
+    var socket =new WebSocket(w+'127.0.0.1:8000/user/{{user.id}}/');
+    var caller_name;
+    socket.onopen = function(event) {
+  console.log("WebSocket is open now.");
+  dowork()
+};
+socket.onmessage=function(event){
+    a=JSON.parse(event.data)
+    if(a.type=='videocall'){
+        handlevidata(a)
+    }
+    else{handledata(a)}
+    
+   
+}
+    let fromData;
+    function readURL(input) {
+        if(user!=''){
+        
+       
+        
+  
+    
+    if (input.files && input.files[0]) {
+        fromData = new FormData();
+        fromData.append('image_upload', input.files[0]);
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#imgg')
+                .attr('src', e.target.result)
+                
+        };
+
+        reader.readAsDataURL(input.files[0]);
+        $('div.popup').show()
+        document.getElementById('sio').innerHTML+=' '+hashtag_info[user+userid][4]
+    }
+    else{
+       
+        $('div.popup').hide()
+        
+    }
+}
+}
+    
+    function sendimage(){
+      
+      
+        fetch('/api/imageupload/',{
+            method:'POST',
+            
+            body:fromData,
+            headers:{
+                "X-CSRFToken":'{{csrf_token}}',
+                
+            }
+        })
+        .then(response=>response.json())
+        .then(data=>{sendmessage('img',data.image_upload)})
+        .catch(error=>{
+            console.error(error)
+        })
+        
+        $('div.popup').hide()
+       
+
+    }
+   function makepost(url,data){
+       console.log(data)
+       return new Promise((resolve,reject)=>{
+        fetch(url,{
+            method:'POST',
+            
+            body:JSON.stringify(data),
+            headers:{
+                'Accept': 'application/json',
+                
+                'Content-Type': 'application/json',
+                "X-CSRFToken":'{{csrf_token}}',
+                
+            }
+        })
+        .then(response=>response.json())
+        .then((data)=>{resolve(data)})
+        .catch(error=>{
+            reject(error)
+        })
+    
+
+       })
+   }
+   
+    function handledata(data){
+        
+
+        if(data.type=='userms'){
+           
+          
+            if('user_'+user==data.username || 'user_'+user==data.user_send){
+                if(data.username=='user_'+userid){
+                    if(data.mty=='text'){
+                        
+                        $('div.spy').append(`<div class='receiver'><div class='show'><p>${data.msg}</p></div></div>`)
+                    }
+                    else if(data.mty=='loc'){
+                        $('div.spy').append(`<div class='receiver'><div id=${data.msg}u class='show'><div id=${data.msg}l><input id=${data.msg}p type='password' placeholder='Enter password'><button type='button' onclick='unlockit(${data.msg})'>Unlock</button></div></div></div>`)
+
+
+                    }
+                    else{
+                        $('div.spy').append(`<div class='receiver'><div class='show'><img src='${data.msg}'></div></div>`)
+
+                    }
+                    
+                }
+                else{
+                    if(data.mty=='text'){
+                       
+                    $('div.spy').append(`<div class='sender'><div class='show'><p>${data.msg}</p></div></div>`)
+                    }
+                    else if(data.mty=='loc'){
+                        $('div.spy').append(`<div class='sender'><div id=${data.msg}u class='show'><div id=${data.msg}l><input id=${data.msg}p type='password' placeholder='Enter password'><button type='button' onclick='unlockit(${data.msg})'>Unlock</button></div></div></div>`)
+
+
+                    }
+                    else{
+                        $('div.spy').append(`<div class='sender'><div class='show'><img src='${data.msg}'></div></div>`)
+                    }
+}
+                   $('div.spy').scrollTop($('div.spy')[0].scrollHeight); 
+            }
+            if(data.seen){
+                if(data.user==userid){
+                    hashtag_info[data.hashtag][1]=false
+                hashtag_info[data.hashtag][0]+=1
+                
+                a=document.getElementById(data.hashtag+'count')
+                if (a.style.display=='none'){a.style.display='block'}
+                a.innerHTML=hashtag_info[data.hashtag][0]
+
+                }
+            }
+            else{
+                $('div.spy').append('<div class="sender"><h3>seen</h3></div>')
+                $('div.spy').scrollTop($('div.spy')[0].scrollHeight); 
+                hashtag_info[data.hashtag][1]=true
+
+            }
+            hashtag_info[data.hashtag][3]=data.username
+            user_messages[data.hashtag].push([data.id,data.msg,data.username,data.mty])
+            if(data.mty=='img'){
+            document.getElementById(data.hashtag+'lmg').innerHTML='Sent You An Image'
+            }
+            else if(data.mty=='loc'){
+                document.getElementById(data.hashtag+'lmg').innerHTML='locked message!'
+
+            }
+            else{
+                document.getElementById(data.hashtag+'lmg').innerHTML=data.msg
+            }
+        }
+        else if (data.type=='sel'){
+            globalselected.push(Number(data.user_send.substr(5)))
+            console.log('selected by global user')
+            if(data.seen){
+                hashtag_info[data.hashtag][1]=true
+                if(user+userid==data.hashtag){
+                    $('div.spy').append('<div class="sender"><h3>seen</h3></div>')
+                    $('div.spy').scrollTop($('div.spy')[0].scrollHeight); 
+                    
+                }
+               
+            }
+           
+           
+        }
+        else if(data.type=='unsel'){
+         alert('rec')
+            
+            try{
+                rr=globalselected.indexOf(data.user)
+            globalselected.splice(rr,1)
+
+            }
+            catch{
+                alert('error')
+            }
+        }
+        else if(data.type=='seton'){
+           if(localselected.includes(data.user)){
+               emitdata(seldata)
+
+           }
+           
+            $("#"+data.user+'oe').css("background-color", "green");
+            hashtag_info[Number(data.user)+userid][6]=true 
+        }
+        else if(data.type=='off'){
+   
+           $("#"+data.user+'oe').css("background-color", "red");
+           try{
+            hashtag_info[Number(data.user)+userid][6]=false
+           }
+           catch{}
+           if(globalselected.includes(data.user)){
+               s=globalselected.indexOf(data.user)
+               globalselected.splice(s,1)
+
+           }
+           
+           
+       }
+       else if(data.type=='mul'){
+           mul=true
+           alert('true')
+       }
+       else if (data.type=='re'){
+      
+                r=document.getElementById(`${data.user+userid}count`)
+      
+           r.style.display='none'
+           
+           
+       
+          hashtag_info[data.user+userid][0]=0
+          hashtag_info[data.user+userid][1]=true
+                
+            }
+       
+
+
+    }
+    function makerequest(request){
+       return new Promise((resolve,reject)=>{
+           fetch(request)
+           .then((response)=>response.json())
+           .then(data=>{resolve (data)})
+           .catch(error=>{
+              console.error(error)
+            reject("Some Thing Went Wrong!")})
+           })
+    }
+    function emitdata(socketdata,ou){
+       
+        if(ou==undefined){
+            socketdata.username='user_'+user
+        socketdata.user_send='user_'+userid
+        socketdata.user=user
+       
+
+        }
+        
+        socket.send(JSON.stringify(socketdata))
+    }
+    async function dowork(){
+        const get_api=await makerequest('/api/chat/')
+        for(x in get_api.order){
+            hashtag_info[get_api.order[x].hashtag]=[get_api.order[x].msgcount,get_api.order[x].status,'You have connected sucessfully']
+            user_messages[get_api.order[x].hashtag]=[]
+            order.push(get_api.order[x].hashtag)
+        }
+        for(x in get_api.message){
+            hashtag_info[get_api.message[x].hashtag][3]=get_api.message[x].receiver
+            hashtag_info[get_api.message[x].hashtag][2]=get_api.message[x].messagd
+            hashtag_info[get_api.message[x].hashtag][7]=get_api.message[x].messagetype
+        }
+        for(d in get_api.profile){
+            hash=get_api.profile[d].user+userid
+            hashtag_info[hash][4]=get_api.profile[d].name
+            hashtag_info[hash][5]=get_api.profile[d].profile_pic
+            hashtag_info[hash][6]=get_api.profile[d].online_status
+        }
+        displayit()
+    }
+    async function sendlocked(){
+        da={'message':$('#inputmsg').val()}
+        a=await makepost(`/api/locker/${user}/${userid+user}/`,da)
+        
+        sendmessage('loc',a.ok)
+    }
+    async function unlockit(a){
+      
+        dat={'pass':document.getElementById(a+'p').value,'id':Number(a)}
+        
+        t=await makepost(`api/getlocker/${user}/${user+userid}/`,dat)
+      
+        if(t['Error']==undefined){
+            document.getElementById(a+'u').innerHTML=t[0].message
+
+        }
+    
+        
+       
+        
+
+
+        
+
+    }
+    function displayit(){
+        online=[]
+        pos=72
+       
+        
+        for(d in order){
+            $('div.main').append(`<div class='userbox' style="transition:transform 0.2s ease 0.1s; height: 72px; transform: translateY(${pos}px);" id=${order[d]} onclick='show(${order[d]})'><img src='${hashtag_info[order[d]][5]}'>${hashtag_info[order[d]][4]}<p id=${order[d]}lmg ></p></div>`)
+            if(hashtag_info[order[d]][6]){
+                online.push(order[d]-userid)
+                
+                $(`#${order[d]}`).append(`<div id=${order[d]-userid}oe class="status-circle" style="background-color:green;"></div>`)
+            }
+            else{
+                $(`#${order[d]}`).append(`<div id=${order[d]-userid}oe class="status-circle" style="background-color:red;"></div>`)
+            }
+            if(hashtag_info[order[d]][0]>0 && hashtag_info[order[d]][3]!=userid){
+                $(`#${order[d]}`).append(`<span id="${order[d]}count" class="dot">${hashtag_info[order[d]][0]}</span>`)
+               
+            }
+            else{
+                $(`#${order[d]}`).append(`<span id="${order[d]}count" style='display:none;' class="dot">${hashtag_info[order[d]][0]}</span>`)
+            }
+            pos+=72
+            if(hashtag_info[order[d]][7]=='img'){
+                document.getElementById(order[d]+'lmg').innerHTML='Sent You An Image'
+
+            }
+            else if(hashtag_info[order[d]][7]=='loc'){
+                document.getElementById(order[d]+'lmg').innerHTML='locked message!'
+
+
+            }
+            else{
+                document.getElementById(order[d]+'lmg').innerHTML=hashtag_info[order[d]][2]
+            }
+            
+        }
+       
+      console.log(online)
+      for (d in online){
+      emitdata({'type':'seton','username':'user_'+online[d],'user':userid},ou='d')
+      }
+       
+      
+        
+    }
+    async function show(hashid){
+        
+        console.log('Selected--',hashid)
+        
+
+        
+        
+        
+        if(user!=''){
+            preuser=user
+            console.log('Unselected--',preuser)
+            t=localselected.indexOf(user)
+            
+            localselected.splice(t,1)
+            document.getElementById(user+userid).style.pointerEvents = 'auto'
+            
+            if(hashtag_info[user+userid][6]){
+                emitdata({'type':'unsel','username':'user_'+user,user:userid},ou='ed')
+            }
+            else{
+                console.log('no-need')
+            }
+        }
+
+
+        user=hashid-userid
+        seldata={type:'sel',username:user,user_send:userid,hashtag:hashid}
+        r=document.getElementById(hashid+'count')
+       
+        if (r.style.display=='block'){
+            r.style.display='none'
+            seldata.re=true
+            
+            
+        }
+        
+        if(hashtag_info[hashid][1]==false && hashtag_info[hashid][3]!=userid && hashtag_info[hashid][0]>0){
+          
+            seldata.seen=true
+            
+            
+        }
+        else{
+            seldata.seen=false 
+        }
+        
+        if(hashtag_info[hashid][6]){
+               
+                emitdata(seldata)
+        }
+        
+        document.getElementById(hashid).style.pointerEvents = 'none' 
+        localselected.push(user)
+        $('div.sender').remove()
+        $('div.receiver').remove()
+
+        if(user_messages[hashid].length<1 ){
+        
+            messages=await makerequest(`/api/getmessages/${hashid-userid}/${hashid}/`)
+            lm=messages.length
+            for(y=lm;y--;){
+                user_messages[hashid].push([messages[y].id,messages[y].messagd,messages[y].receiver,messages[y].messagetype])
+            }
+        }
+        c=user_messages[hashid].length
+       
+        for(i=0;i<c;i++){
+           
+            if(user_messages[hashid][i][2]==userid){
+                if (user_messages[hashid][i][3]=='text'){
+                    $('div.spy').append(`<div class='sender'><div class='show'><p>${user_messages[hashid][i][1]}</p></div></div>`)
+
+                }
+                else if(user_messages[hashid][i][3]=='loc'){
+                        $('div.spy').append(`<div class='sender'><div id=${user_messages[hashid][i][1]}u class='show'><div id=${user_messages[hashid][i][1]}l><input type='password' id=${user_messages[hashid][i][1]}p placeholder='Enter password'><button type='button' onclick='unlockit(${user_messages[hashid][i][1]})'>Unlock</button></div></div></div>`)
+
+
+                    }
+                else{
+                    $('div.spy').append(`<div class='sender'><div class='show'><img src='${user_messages[hashid][i][1]}'></div></div>`)
+                }
+            }
+        else{
+            if (user_messages[hashid][i][3]=='text'){
+            $('div.spy').append(`<div class='receiver'><div class='show' ><p>${user_messages[hashid][i][1]}</p></div></div>`)
+            }
+            else if(user_messages[hashid][i][3]=='loc'){
+                        $('div.spy').append(`<div class='receiver'><div class='show'  id=${user_messages[hashid][i][1]}u><div id=${user_messages[hashid][i][1]}l><input type='password' id=${user_messages[hashid][i][1]}p placeholder='Enter password'><button type='button' onclick='unlockit(${user_messages[hashid][i][1]})'>Unlock</button></div></div></div>`)
+
+
+                    }
+                    else{
+                $('div.spy').append(`<div class='receiver'><div class='show' ><img src='${user_messages[hashid][i][1]}'></div></div>`)
+            }
+        }
+        
+    }
+    if(hashtag_info[hashid][1] && hashtag_info[hashid][3]==userid){
+           
+        $('div.spy').append('<div class="sender"><h3>seen</h3></div>')
+           
+       }
+            
+
+        
+        
+        
+    }
+    function sendmessage(type,locked){
+      
+
+        
+        
+        hashtag=user+userid
+        
+           
+       
+        if(type=='loc'){
+            
+            data={'type':'userms','mty':'loc','msg':locked,username:user,user_send:userid,hashtag:hashtag,seen:true}
+
+        }
+        else if(type=='img'){
+            data={'type':'userms','mty':'img','msg':locked,username:user,user_send:userid,hashtag:hashtag,seen:true}
+
+        }
+        else{
+            message=$('#inputmsg').val()
+            data={'type':'userms','mty':'text','msg':message,username:user,user_send:userid,hashtag:hashtag,seen:true}
+        }
+
+        
+        
+        if(hashtag_info[hashtag][6]){
+            data.online=true
+           
+        }
+       
+        if(globalselected.includes(user)){
+            data.seen=false
+        }
+       
+        if(preuser!=user){
+            pos=72
+        t=order.indexOf(hashtag)
+        order.splice(t, 1);
+        order.splice(0,0, hashtag)
+        for(x in order){
+            console.log(order[x])
+        document.getElementById(order[x]).style.transform=`translateY(${pos}px)`;
+        pos+=72
+      }
+      
+}
+   emitdata(data)
+    }
+    
+    
+   
+
+
+
+   
+</script>
+<script src="/static/videocall.js"></script>

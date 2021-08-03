@@ -1,0 +1,36 @@
+<h1>{{username}}</h1>
+
+
+<form method='Post'>
+{% csrf_token %}
+{%for name in show %}
+{%if name.id != user.id %}
+ <h1 > {{name.username}}</h1>
+ <button  id={{name.id}}  type='button' onclick="send('{{name.id}}')">Add</button> 
+ </form>
+ {% endif %}
+ {% endfor %}
+
+
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ <script>
+
+ function send(a){
+   
+    $.ajax({
+            type:"POST",
+            url:"/addfriend",
+
+            data:{'username':Number(a),'csrfmiddlewaretoken':'{{csrf_token}}'},
+            dataType:'json',
+            sucess:function(event){
+                event.preventDefault()
+
+                
+
+            }
+        })
+        document.getElementById(a).style.display='none'
+ }
+    
+ </script>
